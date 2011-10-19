@@ -8,9 +8,9 @@
 # Basic metadata ports as well. Puts converted files in same dir as source.
 #
 # Dependency: FFmpeg 0.8.0+. Older versions will likely work too.
-#   On OS X:  Get Homebrew and type `brew install ffmpeg`.
+#   On OS X : Get Homebrew and type `brew install ffmpeg`.
 #   On Linux: `sudo apt-get install flac ffmpeg`
-#   Windows:  [untested]
+#   Windows : [untested]
 
 module FlacAlacIt
   class Converter
