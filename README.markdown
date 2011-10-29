@@ -1,6 +1,6 @@
 ## AlacIt
 
-Apple Lossless conversion utility.  Converts FLAC and WAV audio files to Apple Lossless (ALAC) files in M4A format for importation into iTunes.
+Apple Lossless conversion utility.  Converts FLAC and WAV audio files to Apple Lossless (ALAC) files in M4A format for importation into iTunes, iPhones, iPads, and iPods.
 
 * Very Fast. An entire album in 10 or 15 seconds.
 * No quality loss
