@@ -1,8 +1,6 @@
-## FlacAlacIt
+## AlacIt
 
-Command-line FLAC to Apple-Lossless conversion utility.
-
-Converts FLAC audio files to Apple Lossless (ALAC) files in an M4A container for importation into iTunes.
+Apple Lossless conversion utility.  Converts FLAC and WAV audio files to Apple Lossless (ALAC) files in M4A format for importation into iTunes.
 
 * Very Fast. An entire album in 10 or 15 seconds.
 * No quality loss
@@ -13,23 +11,23 @@ Converts FLAC audio files to Apple Lossless (ALAC) files in an M4A container for
 ### Install
 
 1. Ensure you have Ruby 1.9.2 installed, and [FFmpeg](http://ffmpeg.org/).
-2. Put flacalacit.rb in `/usr/local/bin` without its extension, in other words:
-  * `cp ~/Downloads/flacalacit.rb /usr/local/bin/flacalacit`. It will make it easier to type.
-3. Make it executable. `chmod +x /usr/local/bin/flacalacit`
+2. Put alacit.rb in `/usr/local/bin` without its extension, in other words:
+  * `cp ~/Downloads/alacit.rb /usr/local/bin/alacit`. It will make it easier to type.
+3. Make it executable. `chmod +x /usr/local/bin/alacit`
 
 ### Usage
 
 **Single file:**
 
-    flacalacit source.flac
+    alacit source.flac
 
-Will output a file called source.m4v in same directory. 
+Will output a file called `source.m4v` in same directory. 
 
 **Entire directory:**
 
-    flacalacit ~/Music/Artist/Album
+    alacit ~/Music/Artist/Album
 
-Will convert all .flac files in that directory. 
+Will convert all `.flac` and `.wav` files in that directory. 
 
 ### Dependencies
 
@@ -42,4 +40,3 @@ Will convert all .flac files in that directory.
 ### Copyright
 
 Copyright (c) 2012 [Russell Brooks](http://russbrooks.com). See LICENSE.txt for further details.
-

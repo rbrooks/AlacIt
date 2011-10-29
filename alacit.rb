@@ -1,9 +1,9 @@
 #!/usr/bin/env ruby
 
-# FlacAlacIt
+# AlacIt
 #   by: Russell Brooks (russbrooks.com)
 #
-# Converts FLAC audio files to ALAC (Apple Lossless Audio Codec) files in
+# Converts FLAC and WAV files to ALAC (Apple Lossless Audio Codec) files in
 # an M4A container for importation into iTunes. Fast. No loss in quality.
 # Basic metadata ports as well. Puts converted files in same dir as source.
 #
@@ -12,7 +12,7 @@
 #   On Linux: `sudo apt-get install flac ffmpeg`
 #   Windows : [untested]
 
-module FlacAlacIt
+module AlacIt
   class Converter
     def initialize(source)
       abort "Usage: #{$0} <source_dir_or_file>" unless ARGV.length == 1
@@ -31,33 +31,38 @@ module FlacAlacIt
     end
 
     def convert_dir(source_dir)
-      source_glob = File.join(source_dir, '*.flac')
+      source_glob = File.join(source_dir, '*.{flac,wav}')
 
-      if Dir.glob(source_glob).empty?
-        abort 'Error: No FLAC files found.'
-      else
+      unless Dir.glob(source_glob).empty?
         Dir.glob(source_glob) do |file|
           puts "\nConverting: #{file}\n"
-          m4a_filename = File.basename(file, '.flac') + '.m4a'
+          m4a_filename = file.chomp(File.extname(file)) + '.m4a'
           m4a_filepath = File.join(source_dir, m4a_filename)
+
           `ffmpeg  -i "#{file}" -acodec alac "#{m4a_filepath}"`
+
           puts "\nFile \"#{file}\" converted successfully.\n" if $?.success?
         end
+      else
+        abort 'Error: No FLAC or WAV files found.'
       end
     end
 
     def convert_file(file)
-      if File.extname(file).downcase != '.flac'
-        abort 'Error: Not a FLAC file.'
-      else
+      if File.extname(file) =~ /(\.flac|\.wav)/i
         if File.exists? file
           puts "\nConverting: #{file}\n"
-          m4a_filepath =  File.join(File.dirname(file), File.basename(file, '.flac') + '.m4a')
+          m4a_filename = file.chomp(File.extname(file)) + '.m4a'
+          m4a_filepath =  File.join(File.dirname(file), m4a_filename)
+
           `ffmpeg  -i "#{file}" -acodec alac "#{m4a_filepath}"`
+
           puts "\nFile \"#{file}\" converted successfully.\n" if $?.success?
         else
           abort 'Error: File not found.'
         end
+      else
+        abort 'Error: Not a FLAC or WAV file.'
       end
     end
 
@@ -74,5 +79,4 @@ module FlacAlacIt
   end
 end
 
-c = FlacAlacIt::Converter.new ARGV[0]
-
+c = AlacIt::Converter.new ARGV[0]
