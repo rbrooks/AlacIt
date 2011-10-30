@@ -7,40 +7,30 @@
 # an M4A container for importation into iTunes. Fast. No loss in quality.
 # Basic metadata ports as well. Puts converted files in same dir as source.
 #
-# Dependency: FFmpeg 0.8.0+. Older versions will likely work too.
+# Dependency: FFmpeg 0.8.0+. But as far back as 0.5.0 should work too.
 #   On OS X : Get Homebrew and type `brew install ffmpeg`.
 #   On Linux: `sudo apt-get install flac ffmpeg`
 #   Windows : [untested]
 
-module AlacIt
-  require 'open3'
-  require 'optparse'
+require 'open3'
+require 'optparse'
+require 'version'
 
+module AlacIt
   class Converter
     def initialize
       @options = {}
-      executable_name = File.split($0)[1]
+      @executable_name = File.split($0)[1]
+      @usage = "Usage: #{@executable_name} [options] dir [dir ...] [file ...]\n"
+      @usage += "       #{@executable_name} [options] file [file ...] [dir ...]\n"
 
-      if ARGV.length == 0
-        banner = "Usage: #{executable_name} dir [dir ...] [file ...]\n"
-        banner += "       #{executable_name} file [file ...] [dir ...]"
-        STDERR.puts banner
-        exit -1
-      end
+      parse_args
+      ffmpeg_exists
 
-      unless command? 'ffmpeg'
-        error = 'Error: FFmpeg executable not found.'
-        error += ' Install Homebrew and type `brew install ffmpeg`.' if os_is_mac?
-        STDERR.puts error
-        exit 2
-      end
+      convert!
+    end
 
-      OptionParser.new do |opts|
-        opts.on('-f', '--force', 'Overwrite output files') do |v|
-          @options[:force] = true
-        end
-      end.parse!
-
+    def convert!
       ARGV.each do |source|
         if File.directory? source
           convert_dir source
@@ -114,6 +104,44 @@ module AlacIt
 
     private
 
+      def parse_args
+        @opts_parser = OptionParser.new do |opts|
+          opts.banner = "Converts ALAC and WAV files to Apple Lossless.\n\n"
+          opts.banner += @usage + "\n"
+
+          opts.on('-f', '--force', 'Overwrite output files') do |f|
+            @options[:force] = true
+          end
+
+          opts.on('-v', '--version', 'AlacIt version') do
+            puts 'AlacIt 0.0.1' # Can't seem to read this from lib/version
+            exit
+          end
+        end
+        @opts_parser.parse!
+
+        args_exist
+      end
+
+      def args_exist
+        if ARGV.empty?
+          STDERR.puts 'Error: You must supply one or more file or directory names.'
+          STDERR.puts
+          STDERR.puts @usage
+          exit -1
+        end
+      end
+    
+      def ffmpeg_exists
+        unless command? 'ffmpeg'
+          error = 'Error: FFmpeg executable not found.'
+          error += ' Install Homebrew and type `brew install ffmpeg`.' if os_is_mac?
+          error += ' To install, type `sudo apt-get install flac ffmpeg`.' if os_is_linux?
+          STDERR.puts error
+          exit 2
+        end
+      end
+
       def command?(name)
         `which #{name}`
         $?.success?
@@ -121,6 +149,10 @@ module AlacIt
 
       def os_is_mac?
         RUBY_PLATFORM.downcase.include? 'darwin'
+      end
+
+      def os_is_linux?
+        RUBY_PLATFORM.downcase.include? 'linux'
       end
   end
 end
