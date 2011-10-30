@@ -15,18 +15,25 @@
 module AlacIt
   class Converter
     def initialize(source)
-      abort "Usage: #{$0} <source_dir_or_file>" unless ARGV.length == 1
-      if !command?('ffmpeg')
+      executable_name = File.split($0)[1]
+      if ARGV.length != 1
+        STDERR.puts "Usage: #{executable_name} source_dir_or_file"
+        exit -1
+      end
+
+      unless command? 'ffmpeg'
         error = 'Error: FFmpeg executable not found.'
         error += ' Install Homebrew and type `brew install ffmpeg`.' if os_is_mac?
-        abort error
+        STDERR.puts error
+        exit 2
       end
+
       if File.directory? source
         convert_dir source
       elsif File.file? source
         convert_file source
       else
-        abort 'Error: Path provided is not a file or directory.'
+        abort "Error: #{source}: No such file or directory."
       end
     end
 
@@ -36,6 +43,7 @@ module AlacIt
       unless Dir.glob(source_glob).empty?
         Dir.glob(source_glob) do |file|
           puts "\nConverting: #{file}\n"
+
           m4a_filename = file.chomp(File.extname(file)) + '.m4a'
           m4a_filepath = File.join(source_dir, m4a_filename)
 
@@ -59,7 +67,7 @@ module AlacIt
 
           puts "\nFile \"#{file}\" converted successfully.\n" if $?.success?
         else
-          abort 'Error: File not found.'
+          abort 'Error: No such file.'
         end
       else
         abort 'Error: Not a FLAC or WAV file.'
