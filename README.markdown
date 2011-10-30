@@ -10,7 +10,7 @@ Apple Lossless conversion utility.  Converts FLAC and WAV audio files to Apple L
 
 ### Install
 
-1. Ensure you have Ruby 1.9.2 installed, and [FFmpeg](http://ffmpeg.org/).
+Ensure you have Ruby 1.9.2 installed, and [FFmpeg](http://ffmpeg.org/), then type:
 
     gem install alacit
 
