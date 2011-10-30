@@ -11,9 +11,8 @@ Apple Lossless conversion utility.  Converts FLAC and WAV audio files to Apple L
 ### Install
 
 1. Ensure you have Ruby 1.9.2 installed, and [FFmpeg](http://ffmpeg.org/).
-2. Put alacit.rb in `/usr/local/bin` without its extension, in other words:
-  * `cp ~/Downloads/alacit.rb /usr/local/bin/alacit`. It will make it easier to type.
-3. Make it executable. `chmod +x /usr/local/bin/alacit`
+
+    gem install alacit
 
 ### Usage
 
@@ -55,7 +54,7 @@ AlacIt won't overwrite existing files by default. If you need to, just force ove
 ### Dependencies
 
 * **Ruby 1.9.2**
-* **FFmpeg 0.8.0+** - Older versions will likely work too.
+* **FFmpeg 0.8.0+** - As far back as 0.5.0 should work too.
   * **On OS X:**  Get [Homebrew](http://mxcl.github.com/homebrew/) and type `brew install ffmpeg`.
   * **On Linux:** `sudo apt-get install flac ffmpeg`
   * **Windows:**  [untested]
