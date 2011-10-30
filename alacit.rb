@@ -13,11 +13,18 @@
 #   Windows : [untested]
 
 module AlacIt
+  require 'open3'
+  require 'optparse'
+
   class Converter
-    def initialize(source)
+    def initialize
+      @options = {}
       executable_name = File.split($0)[1]
-      if ARGV.length != 1
-        STDERR.puts "Usage: #{executable_name} source_dir_or_file"
+
+      if ARGV.length == 0
+        banner = "Usage: #{executable_name} dir [dir ...] [file ...]\n"
+        banner += "       #{executable_name} file [file ...] [dir ...]"
+        STDERR.puts banner
         exit -1
       end
 
@@ -28,13 +35,22 @@ module AlacIt
         exit 2
       end
 
-      if File.directory? source
-        convert_dir source
-      elsif File.file? source
-        convert_file source
-      else
-        abort "Error: #{source}: No such file or directory."
+      OptionParser.new do |opts|
+        opts.on('-f', '--force', 'Overwrite output files') do |v|
+          @options[:force] = true
+        end
+      end.parse!
+
+      ARGV.each do |source|
+        if File.directory? source
+          convert_dir source
+        elsif File.file? source
+          convert_file source
+        else
+          abort "Error: #{source}: Not a file or directory."
+        end
       end
+      exit $?.exitstatus
     end
 
     def convert_dir(source_dir)
@@ -42,35 +58,57 @@ module AlacIt
 
       unless Dir.glob(source_glob).empty?
         Dir.glob(source_glob) do |file|
-          puts "\nConverting: #{file}\n"
+          m4a_file = file.chomp(File.extname(file)) + '.m4a'
 
-          m4a_filename = file.chomp(File.extname(file)) + '.m4a'
-          m4a_filepath = File.join(source_dir, m4a_filename)
+          if !File.exists?(m4a_file) || @options[:force]
+            command = 'ffmpeg -y -i "' + file + '" -acodec alac "' + m4a_file + '"'
+            stdout_str, stderr_str, status = Open3.capture3(command)
 
-          `ffmpeg  -i "#{file}" -acodec alac "#{m4a_filepath}"`
-
-          puts "\nFile \"#{file}\" converted successfully.\n" if $?.success?
+            if status.success?
+              puts "#{file}: Converted."
+            else
+              STDERR.puts "Error: #{file}: File could not be converted."
+              STDERR.puts stderr_str.split("\n").last
+              next
+            end
+          else
+            STDERR.puts "Error: #{m4a_file} exists."
+            next
+          end
         end
       else
-        abort 'Error: No FLAC or WAV files found.'
+        STDERR.puts 'Error: No FLAC or WAV files found.'
+        return
       end
     end
 
     def convert_file(file)
       if File.extname(file) =~ /(\.flac|\.wav)/i
         if File.exists? file
-          puts "\nConverting: #{file}\n"
-          m4a_filename = file.chomp(File.extname(file)) + '.m4a'
-          m4a_filepath =  File.join(File.dirname(file), m4a_filename)
+          m4a_file = file.chomp(File.extname(file)) + '.m4a'
 
-          `ffmpeg  -i "#{file}" -acodec alac "#{m4a_filepath}"`
+          if !File.exists?(m4a_file) || @options[:force]
+            command = 'ffmpeg -y -i "' + file + '" -acodec alac "' + m4a_file + '"'
+            stdout_str, stderr_str, status = Open3.capture3(command)
 
-          puts "\nFile \"#{file}\" converted successfully.\n" if $?.success?
+            if status.success?
+              puts "#{file}: Converted."
+            else
+              STDERR.puts "Error: #{file}: File could not be converted."
+              STDERR.puts stderr_str.split("\n").last
+              return
+            end
+          else
+            STDERR.puts "Error: #{m4a_file} exists."
+            return
+          end
         else
-          abort 'Error: No such file.'
+          STDERR.puts "Error: #{file}: No such file."
+          return
         end
       else
-        abort 'Error: Not a FLAC or WAV file.'
+        STDERR.puts "Error: #{file}: Not a FLAC or WAV file."
+        return
       end
     end
 
@@ -87,4 +125,4 @@ module AlacIt
   end
 end
 
-c = AlacIt::Converter.new ARGV[0]
+c = AlacIt::Converter.new
