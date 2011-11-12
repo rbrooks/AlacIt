@@ -1,7 +1,11 @@
-require "bundler/gem_tasks"
-# require 'rubygems/package_task'
-# 
-# spec = eval(File.read('alacit.gemspec'))
-# 
-# Gem::PackageTask.new(spec) do |pkg|
-# end
+#!/usr/bin/env rake
+require 'bundler/gem_tasks'
+require 'rake/testtask'
+
+Rake::TestTask.new(:test) do |t|
+  t.libs << 'lib' << 'test'
+  t.pattern = 'test/**/*_test.rb'
+  t.verbose = true
+end
+
+task :default => :test
