@@ -37,7 +37,7 @@ module AlacIt
 
     def parse_args
       OptionParser.new do |opts|
-        opts.banner = "Converts ALAC and WAV files to Apple Lossless.\n\n"
+        opts.banner = "Converts FLAC and WAV files to Apple Lossless.\n\n"
         @usage = "Usage: #{@name} [options] dir [dir ...] [file ...]\n"
         @usage += "       #{@name} [options] file [file ...] [dir ...]\n"
         opts.banner += "#{@usage}\n"
