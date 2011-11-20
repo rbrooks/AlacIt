@@ -41,6 +41,7 @@ class AlacItTest < MiniTest::Unit::TestCase
     ARGV << File.join(@temp_dir, 'test.flac')
     out, = capture_io { @app.convert }
     assert_match /test\.flac converted/, out
+    assert_equal File.exists?(File.join(@temp_dir, 'test.m4a')), true
   end
 
   def test_single_wav
@@ -49,6 +50,7 @@ class AlacItTest < MiniTest::Unit::TestCase
     ARGV << File.join(@temp_dir, 'test2.wav')
     out, = capture_io { @app.convert }
     assert_match /test2\.wav converted/, out
+    assert_equal File.exists?(File.join(@temp_dir, 'test2.m4a')), true
   end
 
   def test_mixed_directory
@@ -59,6 +61,8 @@ class AlacItTest < MiniTest::Unit::TestCase
     out, = capture_io { @app.convert }
     assert_match /test\.flac converted/, out
     assert_match /test2\.wav converted/, out
+    assert_equal File.exists?(File.join(@temp_dir, 'test.m4a')), true
+    assert_equal File.exists?(File.join(@temp_dir, 'test2.m4a')), true
   end
 
   def test_single_flac_file_exists
@@ -77,6 +81,7 @@ class AlacItTest < MiniTest::Unit::TestCase
     ARGV << '--force' << File.join(@temp_dir, 'test.flac')
     out, = capture_io { @app.convert }
     assert_match /test\.flac converted/, out
+    assert_equal File.exists?(File.join(@temp_dir, 'test.m4a')), true
   end
 
   def test_mixed_directory_file_exists
@@ -88,6 +93,7 @@ class AlacItTest < MiniTest::Unit::TestCase
     out, err = capture_io { @app.convert }
     assert_match /test\.m4a exists/, err
     assert_match /test2\.wav converted/, out
+    assert_equal File.exists?(File.join(@temp_dir, 'test2.m4a')), true
   end
 
   def test_mixed_directory_file_exists_force_overwrite
@@ -99,6 +105,8 @@ class AlacItTest < MiniTest::Unit::TestCase
     out, = capture_io { @app.convert }
     assert_match /test\.flac converted/, out
     assert_match /test2\.wav converted/, out
+    assert_equal File.exists?(File.join(@temp_dir, 'test.m4a')), true
+    assert_equal File.exists?(File.join(@temp_dir, 'test2.m4a')), true
   end
 
   def test_standard_exception_handling_invalid_option
