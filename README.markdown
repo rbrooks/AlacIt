@@ -1,6 +1,6 @@
 ## AlacIt
 
-Apple Lossless conversion utility.  Converts FLAC and WAV audio files to Apple Lossless (ALAC) files in M4A format for importation into iTunes, iPhones, iPads, and iPods.
+Apple Lossless conversion utility.  Converts APE, FLAC, and WAV audio files to Apple Lossless (ALAC) files in M4A format for importation into iTunes, iPhones, iPads, and iPods.
 
 * Very Fast. An entire album in 10 to 15 seconds.
 * No quality loss
@@ -10,7 +10,7 @@ Apple Lossless conversion utility.  Converts FLAC and WAV audio files to Apple L
 
 ### Install
 
-Ensure you have Ruby 1.9.2 installed, and [FFmpeg](http://ffmpeg.org/), then type:
+Ensure you have Ruby 1.9.2+ installed, and [FFmpeg](http://ffmpeg.org/), then type:
 
     gem install alacit
 
@@ -18,7 +18,7 @@ Ensure you have Ruby 1.9.2 installed, and [FFmpeg](http://ffmpeg.org/), then typ
 
 #### Single Files
 
-Convert a single file.  This outputs a file called `song.m4v` in same directory.
+Convert a single file.  This outputs a file called `song.m4v` in same directory:
 
     alacit song.flac
 
@@ -28,7 +28,7 @@ Convert several individual files:
 
 #### Entire Directories
 
-Convert a single directory.  This finds and converts all `.flac` and `.wav` files in that directory:
+Convert a single directory.  This finds and converts all `.ape`, `.flac`, and `.wav` files in that directory:
 
     alacit ~/Music/Artist/Album
 
@@ -53,8 +53,8 @@ AlacIt won't overwrite existing files by default. If you need to, just force ove
 
 ### Dependencies
 
-* **Ruby 1.9.2**
-* **FFmpeg 0.8.0+** - As far back as 0.5.0 should work too.
+* **Ruby 1.9.2+**
+* **FFmpeg 0.8.0+**
   * **On OS X:**  Get [Homebrew](http://mxcl.github.com/homebrew/) and type `brew install ffmpeg`.
   * **On Linux:** `sudo apt-get install flac ffmpeg`
   * **Windows:**  [untested]

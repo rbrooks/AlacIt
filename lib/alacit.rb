@@ -3,11 +3,11 @@
 # AlacIt
 #   by: Russell Brooks (russbrooks.com)
 #
-# Converts FLAC and WAV files to ALAC (Apple Lossless Audio Codec) files in
-# an M4A container for importation into iTunes. Fast. No loss in quality.
-# Basic metadata ports as well. Puts converted files in same dir as source.
+# Converts APE, FLAC, and WAV files to ALAC (Apple Lossless Audio Codec) files in
+# an M4A container for importation into iTunes. Fast.  No loss in quality.
+# Basic metadata ports as well.  Puts converted files in same dir as source.
 #
-# Dependency: FFmpeg 0.8.0+. But as far back as 0.5.0 should work too.
+# Dependency: FFmpeg 0.8.0+.
 #   On OS X : Get Homebrew and type `brew install ffmpeg`.
 #   On Linux: `sudo apt-get install flac ffmpeg`
 #   Windows : [untested]
@@ -40,14 +40,14 @@ module AlacIt
     end
 
     def convert_dir(source_dir)
-      source_glob = File.join(source_dir, '*.{flac,wav}')
+      source_glob = File.join(source_dir, '*.{ape,flac,wav}')
 
       unless Dir.glob(source_glob).empty?
         Dir.glob(source_glob) do |file|
           m4a_file = file.chomp(File.extname(file)) + '.m4a'
 
           if !File.exists?(m4a_file) || @options[:force]
-            command = 'ffmpeg -y -i "' + file + '" -acodec alac "' + m4a_file + '"'
+            command = 'ffmpeg -y -i "' + file + '" -c:a alac "' + m4a_file + '"'
             stdout_str, stderr_str, status = Open3.capture3(command)
 
             if status.success?
@@ -63,13 +63,13 @@ module AlacIt
           end
         end
       else
-        $stderr.puts 'Error: No FLAC or WAV files found.'
+        $stderr.puts 'Error: No APE, FLAC, or WAV files found.'
         return
       end
     end
 
     def convert_file(file)
-      if File.extname(file) =~ /(\.flac|\.wav)/i
+      if File.extname(file) =~ /(\.ape|\.flac|\.wav)/i
         if File.exists? file
           m4a_file = file.chomp(File.extname(file)) + '.m4a'
 
@@ -93,7 +93,7 @@ module AlacIt
           return
         end
       else
-        $stderr.puts "Error: #{file}: Not a FLAC or WAV file."
+        $stderr.puts "Error: #{file}: Not an APE, FLAC, or WAV file."
         return
       end
     end

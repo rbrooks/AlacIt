@@ -35,6 +35,15 @@ class AlacItTest < MiniTest::Unit::TestCase
     ARGV.clear
   end
 
+  def test_single_ape
+    FileUtils.cp 'test/fixtures/test.ape', @temp_dir
+    ARGV.clear
+    ARGV << File.join(@temp_dir, 'test.ape')
+    out, = capture_io { @app.convert }
+    assert_match /test\.ape converted/, out
+    assert_equal File.exists?(File.join(@temp_dir, 'test.m4a')), true
+  end
+
   def test_single_flac
     FileUtils.cp 'test/fixtures/test.flac', @temp_dir
     ARGV.clear
