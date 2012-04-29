@@ -6,6 +6,7 @@ Apple Lossless conversion utility.  Converts APE, FLAC, and WAV audio files to A
 * No quality loss
 * Basic metadata survives: Song, Artist, etc.
 * Converts entire directories, single files, or any combination thereof.
+* Cue-Sheet splitting / extraction
 * Puts converted files in same dir as source.
 
 ### Install
@@ -50,6 +51,10 @@ AlacIt won't overwrite existing files by default. If you need to, just force ove
 
     alacit --force song.flac
     alacit -f song.flac
+
+#### Cue-Sheet Splitting
+
+Have you ever downloaded an album and it's a single, large audio file along with a `.cue` file?  AlacIt will split that into individual files for you.  If a matching-named `.cue` sheet is found in the same directory as the audio file, then multiple M4A's are generated based on the Cue Sheet data.
 
 ### Dependencies
 

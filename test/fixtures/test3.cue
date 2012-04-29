@@ -1,0 +1,19 @@
+REM GENRE "Techno"
+REM DATE 2012
+REM DISCID CF0A720E
+REM COMMENT "ExactAudioCopy v0.99pb5"
+PERFORMER "Vader"
+TITLE "Test Title"
+FILE "test3.ape" WAVE
+  TRACK 01 AUDIO
+    TITLE "Track1"
+    PERFORMER "Faithless"
+    INDEX 01 00:00:00
+  TRACK 02 AUDIO
+    TITLE "Track2"
+    PERFORMER "Faithless"
+    INDEX 01 00:30:74
+  TRACK 03 AUDIO
+    TITLE "Track3"
+    PERFORMER "Faithless"
+    INDEX 01 00:60:39

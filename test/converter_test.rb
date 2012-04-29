@@ -36,12 +36,12 @@ class AlacItTest < MiniTest::Unit::TestCase
   end
 
   def test_single_ape
-    FileUtils.cp 'test/fixtures/test.ape', @temp_dir
+    FileUtils.cp 'test/fixtures/test3.ape', @temp_dir
     ARGV.clear
-    ARGV << File.join(@temp_dir, 'test.ape')
+    ARGV << File.join(@temp_dir, 'test3.ape')
     out, = capture_io { @app.convert }
-    assert_match /test\.ape converted/, out
-    assert_equal File.exists?(File.join(@temp_dir, 'test.m4a')), true
+    assert_match /test3\.ape converted/, out
+    assert_equal File.exists?(File.join(@temp_dir, 'test3.m4a')), true
   end
 
   def test_single_flac
@@ -62,6 +62,22 @@ class AlacItTest < MiniTest::Unit::TestCase
     assert_equal File.exists?(File.join(@temp_dir, 'test2.m4a')), true
   end
 
+  def test_single_ape_with_cue_file
+    FileUtils.cp 'test/fixtures/test3.ape', @temp_dir
+    FileUtils.cp 'test/fixtures/test3.cue', @temp_dir
+    ARGV.clear
+    ARGV << File.join(@temp_dir, 'test3.ape')
+    out, = capture_io { @app.convert }
+    refute_match /test3\.ape converted/, out
+    assert_match /01 - Track1.m4a\" extracted based on cue sheet/, out
+    assert_match /02 - Track2.m4a\" extracted based on cue sheet/, out
+    assert_match /03 - Track3.m4a\" extracted based on cue sheet/, out
+    assert_equal File.exists?(File.join(@temp_dir, 'test3.m4a')), false
+    assert_equal File.exists?(File.join(@temp_dir, '01 - Track1.m4a')), true
+    assert_equal File.exists?(File.join(@temp_dir, '02 - Track2.m4a')), true
+    assert_equal File.exists?(File.join(@temp_dir, '03 - Track3.m4a')), true
+  end
+
   def test_mixed_directory
     FileUtils.cp 'test/fixtures/test.flac', @temp_dir
     FileUtils.cp 'test/fixtures/test2.wav', @temp_dir
@@ -80,7 +96,7 @@ class AlacItTest < MiniTest::Unit::TestCase
     ARGV.clear
     ARGV << File.join(@temp_dir, 'test.flac')
     out, err = capture_io { @app.convert }
-    assert_match /test\.m4a exists/, err
+    assert_match /test\.m4a\" exists/, err
   end
 
   def test_single_flac_file_exists_force_overwrite
@@ -100,7 +116,7 @@ class AlacItTest < MiniTest::Unit::TestCase
     ARGV.clear
     ARGV << File.join(@temp_dir)
     out, err = capture_io { @app.convert }
-    assert_match /test\.m4a exists/, err
+    assert_match /test\.m4a\" exists/, err
     assert_match /test2\.wav converted/, out
     assert_equal File.exists?(File.join(@temp_dir, 'test2.m4a')), true
   end

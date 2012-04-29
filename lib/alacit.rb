@@ -12,9 +12,11 @@
 #   On Linux: `sudo apt-get install flac ffmpeg`
 #   Windows : [untested]
 
+require 'application'
+require 'cuesheet'
+require 'index'
 require 'open3'
 require 'version'
-require 'application'
 
 module AlacIt
   class Converter < Application
@@ -44,22 +46,28 @@ module AlacIt
 
       unless Dir.glob(source_glob).empty?
         Dir.glob(source_glob) do |file|
-          m4a_file = file.chomp(File.extname(file)) + '.m4a'
+          cue_file = file.chomp(File.extname(file)) + '.cue'
 
-          if !File.exists?(m4a_file) || @options[:force]
-            command = 'ffmpeg -y -i "' + file + '" -c:a alac "' + m4a_file + '"'
-            stdout_str, stderr_str, status = Open3.capture3(command)
+          if File.exists? cue_file
+            extract_songs file, cue_file
+          else
+            m4a_file = file.chomp(File.extname(file)) + '.m4a'
 
-            if status.success?
-              puts "#{file} converted."
+            if !File.exists?(m4a_file) || @options[:force]
+              command = 'ffmpeg -y -i "' + file + '" -c:a alac "' + m4a_file + '"'
+              stdout_str, stderr_str, status = Open3.capture3(command)
+
+              if status.success?
+                puts "#{file} converted."
+              else
+                $stderr.puts "Error: #{file}: File could not be converted."
+                $stderr.puts stderr_str.split("\n").last
+                next
+              end
             else
-              $stderr.puts "Error: #{file}: File could not be converted."
-              $stderr.puts stderr_str.split("\n").last
+              $stderr.puts "Error: \"#{m4a_file}\" exists. Use --force option to overwrite."
               next
             end
-          else
-            $stderr.puts "Error: #{m4a_file} exists. Use --force option to overwrite."
-            next
           end
         end
       else
@@ -71,22 +79,30 @@ module AlacIt
     def convert_file(file)
       if File.extname(file) =~ /(\.ape|\.flac|\.wav)/i
         if File.exists? file
-          m4a_file = file.chomp(File.extname(file)) + '.m4a'
+          cue_file = file.chomp(File.extname(file)) + '.cue'
 
-          if !File.exists?(m4a_file) || @options[:force]
-            command = 'ffmpeg -y -i "' + file + '" -acodec alac "' + m4a_file + '"'
-            stdout_str, stderr_str, status = Open3.capture3(command)
+          if File.exists? cue_file
+            extract_songs file, cue_file
+          else
+            # File has no Cuesheet. Convert the entire file.
+            m4a_file = file.chomp(File.extname(file)) + '.m4a'
 
-            if status.success?
-              puts "#{file} converted."
+            if !File.exists?(m4a_file) || @options[:force]
+              command = 'ffmpeg -y -i "' + file + '" -c:a alac "' + m4a_file + '"'
+
+              stdout_str, stderr_str, status = Open3.capture3(command)
+
+              if status.success?
+                puts "#{file} converted."
+              else
+                $stderr.puts "Error: #{file}: File could not be converted."
+                $stderr.puts stderr_str.split("\n").last
+                return
+              end
             else
-              $stderr.puts "Error: #{file}: File could not be converted."
-              $stderr.puts stderr_str.split("\n").last
+              $stderr.puts "Error: \"#{m4a_file}\" exists. Use --force option to overwrite."
               return
             end
-          else
-            $stderr.puts "Error: #{m4a_file} exists."
-            return
           end
         else
           $stderr.puts "Error: #{file}: No such file."
@@ -95,6 +111,37 @@ module AlacIt
       else
         $stderr.puts "Error: #{file}: Not an APE, FLAC, or WAV file."
         return
+      end
+    end
+
+    def extract_songs(file, cue_file)
+      cuesheet = AlacIt::Cuesheet.new(File.read(cue_file))
+      cuesheet.parse!
+
+      cuesheet.songs.each do |song|
+        m4a_filename = song[:track].to_s.rjust(2, '0') + ' - ' + song[:title] + '.m4a'
+        m4a_file = File.join(File.dirname(file), m4a_filename)
+
+        if !File.exists?(m4a_file) || @options[:force]
+          command = 'ffmpeg -y'
+          command << ' -i "' + file + '" -c:a alac'
+          command << ' -ss ' + song[:index].to_human_ms
+          command << (song[:duration].nil? ? '' : ' -t ' + song[:duration].to_human_ms)
+          command << ' "' + m4a_file + '"'
+
+          stdout_str, stderr_str, status = Open3.capture3(command)
+
+          if status.success?
+            puts "\"#{m4a_filename}\" extracted based on cue sheet."
+          else
+            $stderr.puts "Error: \"#{m4a_filename}\": File could not be extracted."
+            $stderr.puts stderr_str.split("\n").last
+            next
+          end
+        else
+          $stderr.puts "Error: \"#{m4a_filename}\" exists. Use --force option to overwrite."
+          next
+        end
       end
     end
   end
