@@ -1,5 +1,9 @@
 # AlacIt Changelog
 
+## 1.0.1
+
+* Improve Alacit installation speed.
+
 ## 1.0.0
 
 * Cue-Sheet Splitting (Extraction) - If a matching-named `.cue` sheet is found in the same directory as the audio file, then multiple M4A's are generated based on the Cue Sheet data.
